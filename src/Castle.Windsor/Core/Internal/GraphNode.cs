@@ -52,5 +52,10 @@ namespace Castle.Core.Internal
 		{
 			get { return Dependents; }
 		}
+
+		public void TrimExcess()
+		{
+			outgoing?.TrimExcess();
+		}
 	}
 }

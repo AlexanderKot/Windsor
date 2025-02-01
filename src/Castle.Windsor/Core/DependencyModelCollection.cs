@@ -29,7 +29,7 @@ namespace Castle.Core
 	public class DependencyModelCollection : IMutableCollection<DependencyModel>
 	{
 		[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-		private readonly List<DependencyModel> dependencies = new List<DependencyModel>();
+		private readonly List<DependencyModel> dependencies = new List<DependencyModel>(1);
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		public int Count
@@ -61,6 +61,11 @@ namespace Castle.Core
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
+		}
+
+		public void TrimExcess()
+		{
+			dependencies.TrimExcess();
 		}
 	}
 }

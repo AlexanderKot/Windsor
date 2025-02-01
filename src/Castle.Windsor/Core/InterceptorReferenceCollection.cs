@@ -34,7 +34,7 @@ namespace Castle.Core
 
 		[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
 		[DebuggerDisplay("Count = {list.Count}", Name = "")]
-		private readonly List<InterceptorReference> list = new List<InterceptorReference>();
+		private readonly List<InterceptorReference> list = new List<InterceptorReference>(1);
 
 		public InterceptorReferenceCollection(ComponentModel component)
 		{
@@ -126,6 +126,11 @@ namespace Castle.Core
 		bool IMutableCollection<InterceptorReference>.Remove(InterceptorReference item)
 		{
 			return list.Remove(item);
+		}
+
+		public void TrimExcess()
+		{
+			list.TrimExcess();
 		}
 	}
 }

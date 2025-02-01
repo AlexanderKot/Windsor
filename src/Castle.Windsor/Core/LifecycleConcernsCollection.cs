@@ -93,7 +93,7 @@ namespace Castle.Core
 			{
 				if (commission == null)
 				{
-					commission = new List<ICommissionConcern>();
+					commission = new List<ICommissionConcern>(1);
 				}
 				return commission;
 			}
@@ -106,7 +106,7 @@ namespace Castle.Core
 			{
 				if (decommission == null)
 				{
-					decommission = new List<IDecommissionConcern>();
+					decommission = new List<IDecommissionConcern>(1);
 				}
 				return decommission;
 			}
@@ -164,6 +164,12 @@ namespace Castle.Core
 				throw new ArgumentNullException(nameof(concern));
 			}
 			Decommission.Remove(concern);
+		}
+
+		public void TrimExcess()
+		{
+			commission?.TrimExcess();
+			decommission?.TrimExcess();
 		}
 	}
 }

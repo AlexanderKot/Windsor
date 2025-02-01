@@ -66,5 +66,10 @@ namespace Castle.Core
 		{
 			return properties.Remove(item);
 		}
+
+		public void TrimExcess()
+		{
+			properties.TrimExcess();
+		}
 	}
 }

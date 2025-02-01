@@ -20,7 +20,7 @@ namespace Castle.Core.Internal
 	public class SimpleSortedSet<T> : ICollection<T>
 	{
 		private readonly IComparer<T> comparer;
-		private readonly List<T> items = new List<T>();
+		private readonly List<T> items = new List<T>(1);
 
 		public SimpleSortedSet() : this(Comparer<T>.Default)
 		{
@@ -101,6 +101,11 @@ namespace Castle.Core.Internal
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
+		}
+
+		public void TrimExcess()
+		{
+			items.TrimExcess();
 		}
 	}
 }

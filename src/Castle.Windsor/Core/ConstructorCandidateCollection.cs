@@ -60,5 +60,10 @@ namespace Castle.Core
 		{
 			return ctors.Remove(item);
 		}
+
+		public void TrimExcess()
+		{
+			ctors.TrimExcess();
+		}
 	}
 }

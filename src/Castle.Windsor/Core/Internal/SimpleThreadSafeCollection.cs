@@ -15,7 +15,7 @@ namespace Castle.Core.Internal
 
 	public class SimpleThreadSafeCollection<T>
 	{
-		private readonly List<T> implementation = new List<T>();
+		private readonly List<T> implementation = new List<T>(1);
 		private readonly MicroKernel.Internal.Lock @lock =MicroKernel.Internal.Lock.Create();
 
 		public int Count
@@ -50,6 +50,14 @@ namespace Castle.Core.Internal
 			using (@lock.ForReading())
 			{
 				return implementation.ToArray();
+			}
+		}
+
+		public void TrimExcess()
+		{
+			using (@lock.ForReading())
+			{
+				implementation.TrimExcess();
 			}
 		}
 	}

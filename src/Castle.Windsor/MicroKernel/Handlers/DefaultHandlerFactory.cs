@@ -39,6 +39,8 @@ namespace Castle.MicroKernel.Handlers
 
 		private IHandler CreateHandler(ComponentModel model)
 		{
+			model.TrimExcess();
+
 			if (model.RequiresGenericArguments)
 			{
 				var matchingStrategy = GenericImplementationMatchingStrategy(model);

@@ -438,5 +438,18 @@ namespace Castle.Core
 			}
 			return value;
 		}
+
+		public new void TrimExcess()
+		{
+			base.TrimExcess();
+
+			constructors.TrimExcess();
+			lifecycle.TrimExcess();
+			services.TrimExcess();
+			servicesLookup.TrimExcess();
+			interceptors?.TrimExcess();
+			properties?.TrimExcess();
+			dependencies?.TrimExcess();
+		}
 	}
 }
