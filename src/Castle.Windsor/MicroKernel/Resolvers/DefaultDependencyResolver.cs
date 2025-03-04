@@ -29,7 +29,7 @@ namespace Castle.MicroKernel.Resolvers
 	[Serializable]
 	public class DefaultDependencyResolver : IDependencyResolver
 	{
-		private readonly IList<ISubDependencyResolver> subResolvers = new List<ISubDependencyResolver>();
+		private readonly List<ISubDependencyResolver> subResolvers = new List<ISubDependencyResolver>();
 		private ITypeConverter converter;
 		private DependencyDelegate dependencyResolvingDelegate;
 		private IKernelInternal kernel;
@@ -237,7 +237,7 @@ namespace Castle.MicroKernel.Resolvers
 		private bool CanResolveFromSubResolvers(CreationContext context, ISubDependencyResolver contextHandlerResolver, ComponentModel model,
 			DependencyModel dependency)
 		{
-			return subResolvers.Count > 0 && subResolvers.Any(s => s.CanResolve(context, contextHandlerResolver, model, dependency));
+			return subResolvers.Count > 0 && (subResolvers.Find(s => s.CanResolve(context, contextHandlerResolver, model, dependency)) != null);
 		}
 
 		private bool HasAnyComponentInValidState(Type service, DependencyModel dependency, CreationContext context)

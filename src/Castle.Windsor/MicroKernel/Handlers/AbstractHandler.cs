@@ -24,6 +24,7 @@ namespace Castle.MicroKernel.Handlers
 	using Castle.Core.Internal;
 	using Castle.MicroKernel.Context;
 	using Castle.MicroKernel.Resolvers;
+	using System.Collections.Generic;
 
 	/// <summary>
 	///   Implements the basis of <see cref = "IHandler" />
@@ -418,19 +419,34 @@ namespace Castle.MicroKernel.Handlers
 			{
 				return true;
 			}
+
 			var dependencies = missing.ToArray();
 			if (dependencies.Length == 0)
 			{
 				return true;
 			}
-			var constructorDependencies = dependencies.OfType<ConstructorDependencyModel>().ToList();
+
+			//var constructorDependencies = dependencies.OfType<ConstructorDependencyModel>().ToList();
+			var constructorDependencies = new List<ConstructorDependencyModel>(dependencies.Length);
+			foreach (var d in dependencies)
+			{
+				if(d is ConstructorDependencyModel cdm)
+					constructorDependencies.Add(cdm);
+			}
+
 			if (dependencies.Length != constructorDependencies.Count)
 			{
 				return false;
 			}
 
-			var ctorsWithMissingDependenciesCount = constructorDependencies.Select(d => d.Constructor).Distinct().Count();
-			return model.Constructors.Count > ctorsWithMissingDependenciesCount;
+			//var ctorsWithMissingDependenciesCount = constructorDependencies.Select(d => d.Constructor).Distinct().Count();
+			var ctorsWithMissingDependencies = new HashSet<ConstructorDependencyModel>();
+			foreach (var cdm in constructorDependencies)
+			{
+				ctorsWithMissingDependencies.Add(cdm);
+			}
+
+			return model.Constructors.Count > ctorsWithMissingDependencies.Count;
 		}
 
 		private void DisconnectEvents()

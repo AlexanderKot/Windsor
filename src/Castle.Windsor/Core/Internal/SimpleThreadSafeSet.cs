@@ -50,12 +50,12 @@ namespace Castle.Core.Internal
 
 		public T[] ToArray()
 		{
-			List<T> hashSetCopy;
 			using (@lock.ForReading())
 			{
-				hashSetCopy = new List<T>(implementation);
+				var res = new T[implementation.Count];
+				implementation.CopyTo(res);
+				return res;
 			}
-			return hashSetCopy.ToArray();
 		}
 	}
 }

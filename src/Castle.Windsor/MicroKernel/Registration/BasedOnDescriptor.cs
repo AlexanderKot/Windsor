@@ -363,7 +363,7 @@ namespace Castle.MicroKernel.Registration
 			return WithService.Select(types);
 		}
 
-		protected virtual bool Accepts(Type type, out Type[] baseTypes)
+		protected virtual bool Accepts(Type type, out IReadOnlyCollection<Type> baseTypes)
 		{
 			return IsBasedOn(type, out baseTypes)
 			       && ExecuteIfCondition(type)
@@ -404,45 +404,46 @@ namespace Castle.MicroKernel.Registration
 			return false;
 		}
 
-		protected bool IsBasedOn(Type type, out Type[] baseTypes)
+		protected bool IsBasedOn(Type type, out IReadOnlyCollection<Type> baseTypes)
 		{
-			var actuallyBasedOn = new List<Type>();
+			var actuallyBasedOn = new HashSet<Type>();
 			foreach (var potentialBase in potentialBases)
 			{
-				if (potentialBase.GetTypeInfo().IsAssignableFrom(type))
+				var typeInfo = potentialBase.GetTypeInfo();
+				if (typeInfo.IsAssignableFrom(type))
 				{
 					actuallyBasedOn.Add(potentialBase);
 				}
-				else if (potentialBase.GetTypeInfo().IsGenericTypeDefinition)
+				else if (typeInfo.IsGenericTypeDefinition)
 				{
-					if (potentialBase.GetTypeInfo().IsInterface)
+					if (typeInfo.IsInterface)
 					{
 						if (IsBasedOnGenericInterface(type, potentialBase, out baseTypes))
 						{
-							actuallyBasedOn.AddRange(baseTypes);
+							actuallyBasedOn.UnionWith(baseTypes);
 						}
 					}
 
 					if (IsBasedOnGenericClass(type, potentialBase, out baseTypes))
 					{
-						actuallyBasedOn.AddRange(baseTypes);
+						actuallyBasedOn.UnionWith(baseTypes);
 					}
 				}
 			}
-			baseTypes = actuallyBasedOn.Distinct().ToArray();
-			return baseTypes.Length > 0;
+			baseTypes = actuallyBasedOn;
+			return actuallyBasedOn.Count > 0;
 		}
 
 		internal bool TryRegister(Type type, IKernel kernel)
 		{
-			Type[] baseTypes;
+			IReadOnlyCollection<Type> baseTypes;
 
 			if (!Accepts(type, out baseTypes))
 			{
 				return false;
 			}
 			var defaults = CastleComponentAttribute.GetDefaultsFor(type);
-			var serviceTypes = service.GetServices(type, baseTypes);
+			var serviceTypes = service.GetServices(type, baseTypes.ToArray());
 			if (serviceTypes.Count == 0 && defaults.Services.Length > 0)
 			{
 				serviceTypes = defaults.Services;
@@ -466,33 +467,35 @@ namespace Castle.MicroKernel.Registration
 			return true;
 		}
 
-		private static bool IsBasedOnGenericClass(Type type, Type basedOn, out Type[] baseTypes)
+		private static bool IsBasedOnGenericClass(Type type, Type basedOn, out IReadOnlyCollection<Type> baseTypes)
 		{
 			while (type != null)
 			{
-				if (type.GetTypeInfo().IsGenericType &&
+				var typeInfo = type.GetTypeInfo();
+				if (typeInfo.IsGenericType &&
 				    type.GetGenericTypeDefinition() == basedOn)
 				{
 					baseTypes = new[] { type };
 					return true;
 				}
 
-				type = type.GetTypeInfo().BaseType;
+				type = typeInfo.BaseType;
 			}
 			baseTypes = null;
 			return false;
 		}
 
-		private static bool IsBasedOnGenericInterface(Type type, Type basedOn, out Type[] baseTypes)
+		private static bool IsBasedOnGenericInterface(Type type, Type basedOn, out IReadOnlyCollection<Type> baseTypes)
 		{
 			var types = new List<Type>(4);
 			foreach (var @interface in type.GetInterfaces())
 			{
-				if (@interface.GetTypeInfo().IsGenericType &&
+				var typeInfo = @interface.GetTypeInfo();
+				if (typeInfo.IsGenericType &&
 				    @interface.GetGenericTypeDefinition() == basedOn)
 				{
 					if (@interface.DeclaringType == null &&
-						@interface.GetTypeInfo().ContainsGenericParameters)
+						typeInfo.ContainsGenericParameters)
 					{
 						types.Add(@interface.GetGenericTypeDefinition());
 					}
@@ -502,8 +505,8 @@ namespace Castle.MicroKernel.Registration
 					}
 				}
 			}
-			baseTypes = types.ToArray();
-			return baseTypes.Length > 0;
+			baseTypes = types;
+			return types.Count > 0;
 		}
 
 		void IRegistration.Register(IKernelInternal kernel)
