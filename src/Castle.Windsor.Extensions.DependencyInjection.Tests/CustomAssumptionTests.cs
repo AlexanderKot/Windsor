@@ -127,7 +127,7 @@ namespace Castle.Windsor.Extensions.DependencyInjection.Tests
 		}
 
 		[Fact]
-		public void Scoped_service_resolved_outside_scope_in_another_thread()
+		public async Task Scoped_service_resolved_outside_scope_in_another_thread()
 		{
 			var serviceCollection = GetServiceCollection();
 			serviceCollection.AddScoped<ITestService, TestService>();
@@ -154,11 +154,11 @@ namespace Castle.Windsor.Extensions.DependencyInjection.Tests
 				return true;
 			});
 
-			Assert.True(task.Result);
+			Assert.True(await task.ConfigureAwait(true));
 		}
 
 		[Fact]
-		public async void Scoped_service_resolved_outside_scope_in_another_unsafe_thread()
+		public async Task Scoped_service_resolved_outside_scope_in_another_unsafe_thread()
 		{
 			var serviceCollection = GetServiceCollection();
 			serviceCollection.AddScoped<ITestService, TestService>();
@@ -176,7 +176,7 @@ namespace Castle.Windsor.Extensions.DependencyInjection.Tests
 		}
 
 		[Fact]
-		public async void Simulate_async_timer_without_wait()
+		public async Task Simulate_async_timer_without_wait()
 		{
 			Boolean stop = false;
 			Boolean shouldResolve = false;
@@ -337,7 +337,7 @@ namespace Castle.Windsor.Extensions.DependencyInjection.Tests
 		}
 
 		[Fact]
-		public void TryToResolveScopedInOtherThread()
+		public async Task TryToResolveScopedInOtherThread()
 		{
 			var serviceCollection = GetServiceCollection();
 			serviceCollection.AddScoped<ITestService, TestService>();
@@ -364,7 +364,7 @@ namespace Castle.Windsor.Extensions.DependencyInjection.Tests
 				return true;
 			});
 
-			Assert.True(task.Result);
+			Assert.True(await task.ConfigureAwait(true));
 		}
 
 		[Fact]
